@@ -1,6 +1,7 @@
 # Solidus Stripe
 
-[![CircleCI](https://circleci.com/gh/solidusio/solidus_stripe.svg?style=shield)](https://circleci.com/gh/solidusio/solidus_stripe)
+
+[![Tests](https://github.com/solidusio/solidus_stripe/actions/workflows/test.yml/badge.svg)](https://github.com/solidusio/solidus_stripe/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/solidusio/solidus_stripe/branch/main/graph/badge.svg)](https://codecov.io/gh/solidusio/solidus_stripe)
 [![yardoc](https://img.shields.io/badge/docs-rubydoc.info-informational)](https://rubydoc.info/gems/solidus_stripe)
 
