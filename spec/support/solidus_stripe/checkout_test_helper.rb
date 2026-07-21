@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'solidus_starter_frontend_spec_helper'
+require 'solidus_storefront_spec_helper'
 
 module SolidusStripe::CheckoutTestHelper
-  include SolidusStarterFrontend::System::CheckoutHelpers
+  include SolidusStorefront::System::CheckoutHelpers
   def self.included(base)
     base.include Devise::Test::IntegrationHelpers
   end
