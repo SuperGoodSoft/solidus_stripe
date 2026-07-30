@@ -287,9 +287,9 @@ module SolidusStripe::CheckoutTestHelper
     fill_in_stripe_country('United States')
 
     [
-      [{ number: '4242424242424241' }, 'Your card number is invalid'],  # incorrect_number
-      [{ date: '1110' }, "Your card's expiration year is in the past"], # invalid_expiry_year
-      [{ cvc: 99 }, "Your card's security code is incomplete"]          # invalid_cvc
+      [{ number: '4242424242424241' }, 'Your card number is invalid'], # incorrect_number
+      [{ date: '1110' }, "expiration year is in the past"], # invalid_expiry_year
+      [{ cvc: 99 }, "security code is incomplete"] # invalid_cvc
     ].each do |args, text|
       clear_stripe_form
       fill_stripe_form(**args)
@@ -312,9 +312,9 @@ module SolidusStripe::CheckoutTestHelper
     submit_payment
     [
       "Your card number is incomplete",
-      "Your card's expiration date is incomplete",
-      "Your card's security code is incomplete",
-      "Your postal code is incomplete"
+      "expiration date is incomplete",
+      "security code is incomplete",
+      "Your ZIP is invalid"
     ].each do |text|
       within_frame(find_stripe_iframe) do
         expect(page).to have_content(text)
@@ -326,14 +326,14 @@ module SolidusStripe::CheckoutTestHelper
     [
       # Decline codes
       # https://stripe.com/docs/declines/codes
-      ['4000000000000002', 'Your card has been declined.'],                  # Generic decline
-      ['4000000000009995', 'Your card has insufficient funds.'],             # Insufficient funds decline
-      ['4000000000009987', 'Your card has been declined.'],                  # Lost card decline
-      ['4000000000009979', 'Your card has been declined.'],                  # Stolen card decline
-      ['4000000000000069', 'Your card has expired.'],                        # Expired card decline
-      ['4000000000000127', "Your card's security code is incorrect."],       # Incorrect CVC decline
+      ['4000000000000002', 'Your card has been declined.'], # Generic decline
+      ['4000000000009995', 'Your card has insufficient funds.'], # Insufficient funds decline
+      ['4000000000009987', 'Your card was declined.'], # Lost card decline
+      ['4000000000009979', 'Your card has been declined.'], # Stolen card decline
+      ['4000000000000069', 'Your card is expired.'], # Expired card decline
+      ['4000000000000127', "CVC is incorrect"], # Incorrect CVC decline
       ['4000000000000119', 'An error occurred while processing your card.'], # Processing error decline
-      ['4100000000000019', 'Your card has been declined.'],                  # Always blocked - Fraudulent cards: https://stripe.com/docs/testing#fraud-prevention
+      ['4100000000000019', 'Your card was declined.'], # Always blocked - Fraudulent cards: https://stripe.com/docs/testing#fraud-prevention
 
     ].each do |number, text|
       fill_in_stripe_country('United States')
