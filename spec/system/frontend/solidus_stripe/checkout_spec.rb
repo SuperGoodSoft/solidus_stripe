@@ -2,7 +2,7 @@
 
 require 'solidus_stripe_spec_helper'
 
-RSpec.describe 'SolidusStripe Checkout', :js do
+RSpec.describe 'SolidusStripe Checkout', :js, :vcr do
   include SolidusStripe::CheckoutTestHelper
 
   # To learn more about setup_future_usage in different contexts with Stripe Payment Intents:
@@ -100,7 +100,7 @@ RSpec.describe 'SolidusStripe Checkout', :js do
   end
 
   context 'with declined cards' do
-    it 'reject transactions with cards declined at intent creation or invalid fields and return an appropriate response' do # rubocop:disable Layout/LineLength
+    it 'rejects transactions with cards declined at intent creation or invalid fields and returns an appropriate response' do # rubocop:disable Layout/LineLength
       create_payment_method
       visit_payment_step(user: create(:user))
       choose_new_stripe_payment
