@@ -21,7 +21,7 @@ VCR.configure do |config|
   config.register_request_matcher :stripe_uri do |request|
     request.uri =~ %r{^https://api\.stripe\.com/v1/payment_methods/pm_.*} ||
     request.uri =~ %r{^https://api\.stripe\.com/v1/payment_intents/pi_.*} ||
-    request.uri =~ %r{^https://api\.stripe\.com/v1/(customers|payment_intents)}
+    request.uri =~ %r{^https://api\.stripe\.com/v1/(customers|payment_intents|refunds)}
   end
 
   config.default_cassette_options = {
