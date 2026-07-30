@@ -19,6 +19,8 @@ cd ./dummy-app
 echo "require_relative '../../coverage.rb' if ENV['COVERAGE']" >> config/boot.rb
 echo "gem 'rspec_junit_formatter', require: false" >> Gemfile
 echo "gem 'stripe-ruby-mock', group: :test" >> Gemfile
+echo "gem 'vcr', group: :test" >> Gemfile
+echo "gem 'webmock', group: :test" >> Gemfile
 unbundled bundle install
 
 unbundled bundle add $extension_name --path ..
