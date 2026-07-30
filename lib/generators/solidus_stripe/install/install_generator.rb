@@ -84,6 +84,12 @@ module SolidusStripe
         end
       end
 
+      def install_solidus_stripe_fixtures
+        if destination_root.include?('dummy-app')
+          directory 'fixtures', 'fixtures'
+        end
+      end
+
       def load_seeds
         if options[:migrate] && options[:load_seeds]
           say_status :load, "seed data", :blue
