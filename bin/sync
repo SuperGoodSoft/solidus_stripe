@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# Sync the extension's source files into the dummy app before running specs,
+# mirroring solidus's storefront/bin/sync.
+#
+# Like the storefront, we don't use rsync --delete: it would remove files
+# created by `rails new` and `solidus:install` that aren't part of the
+# extension's sources (e.g. the app's own spec/rails_helper.rb).
+#
+# These mirror the paths the install generator copies with --specs=all: the
+# engine specs, the storefront assets, the initializers, and the VCR cassette
+# fixtures. The engine's own app/ and lib/ code is loaded straight from the
+# gem, so it doesn't need syncing.
+
+set -e
+
+templates="lib/generators/solidus_stripe/install/templates"
+
+rsync --archive --verbose "spec/" "dummy-app/spec/"
+rsync --archive --verbose "${templates}/app/" "dummy-app/app/"
+rsync --archive --verbose "${templates}/config/initializers/" "dummy-app/config/initializers/"
+rsync --archive --verbose "${templates}/fixtures/" "dummy-app/fixtures/"
