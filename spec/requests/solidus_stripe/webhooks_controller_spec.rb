@@ -4,9 +4,9 @@ RSpec.describe SolidusStripe::WebhooksController, type: [:request, :webhook_requ
   describe "POST /create" do
     let(:payment_method) { create(:solidus_stripe_payment_method) }
     let(:stripe_payment_intent) {
-      payment_method.gateway.request {
-        Stripe::PaymentIntent.create(amount: 100, currency: 'usd')
-      }
+      # Build the intent locally rather than hitting the live API: these specs
+      # only need an object to construct the webhook event from.
+      Stripe::PaymentIntent.construct_from(id: "pi_123", amount: 100, currency: 'usd')
     }
     let(:context) do
       SolidusStripe::Webhook::EventWithContextFactory.from_object(

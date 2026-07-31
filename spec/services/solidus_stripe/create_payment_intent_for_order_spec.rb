@@ -17,7 +17,7 @@ RSpec.describe SolidusStripe::CreatePaymentIntentForOrder, type: :service do
   before { StripeMock.start }
   after { StripeMock.stop }
 
-  let(:stripe_payment_method) { create_stripe_payment_method('4242424242424242') }
+  let(:stripe_payment_method) { create_stripe_mock_payment_method }
   let(:payment_method) { create(:solidus_stripe_payment_method, name: 'Stripe', type: 'SolidusStripe::PaymentMethod') }
   let(:order) { create(:order, total: 500) }
 

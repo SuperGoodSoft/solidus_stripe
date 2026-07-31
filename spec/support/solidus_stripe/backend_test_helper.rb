@@ -40,6 +40,20 @@ module SolidusStripe::BackendTestHelper
     Stripe::PaymentMethod.construct_from(id: TEST_PAYMENT_METHODS.fetch(card_number))
   end
 
+  # Creates a Stripe payment method from raw test card data. Used by unit specs
+  # running against StripeMock, which — unlike the live API — accepts raw card
+  # data and can retrieve the resulting payment method by id. System specs run
+  # against the live API (via VCR) and must use #create_stripe_payment_method,
+  # which relies on Stripe's predefined test payment methods instead.
+  def create_stripe_mock_payment_method(card_number = '4242424242424242')
+    payment_method.gateway.request do
+      Stripe::PaymentMethod.create(
+        type: 'card',
+        card: { number: card_number, exp_month: 12, exp_year: Time.zone.now.year + 1, cvc: '123' }
+      )
+    end
+  end
+
   def create_stripe_payment_intent(stripe_payment_method_id)
     payment_method.gateway.request do
       Stripe::PaymentIntent.create(

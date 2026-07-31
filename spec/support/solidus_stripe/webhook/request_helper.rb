@@ -15,7 +15,14 @@ module SolidusStripe
       def webhook_request(context, timestamp: context.timestamp)
         post "/solidus_stripe/#{context.slug}/webhooks",
           params: context.json,
-          headers: { webhook_signature_header_key => webhook_signature_header(context, timestamp: timestamp) }
+          headers: {
+            webhook_signature_header_key => webhook_signature_header(context, timestamp: timestamp),
+            # Send the payload as a raw JSON body so `request.body.read` matches
+            # exactly what the Stripe signature was computed over. Without an
+            # explicit content type Rack form-decodes the JSON string and
+            # signature verification fails with a 400.
+            "CONTENT_TYPE" => "application/json"
+          }
       end
 
       private
