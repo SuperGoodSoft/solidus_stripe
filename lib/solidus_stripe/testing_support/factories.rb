@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+FactoryBot.modify do
+  factory :address do
+    phone { "8888675309" }
+    alternative_phone { "8888675309" }
+  end
+end
+
 FactoryBot.define do
   factory :solidus_stripe_payment_method, class: 'SolidusStripe::PaymentMethod' do
     type { "SolidusStripe::PaymentMethod" }
