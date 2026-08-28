@@ -182,6 +182,7 @@ module SolidusStripe::CheckoutTestHelper
     end
 
     visit '/checkout/payment'
+    expect(page).to have_content("Payment Information")
   end
 
   def choose_new_stripe_payment
@@ -211,7 +212,9 @@ module SolidusStripe::CheckoutTestHelper
   end
 
   def submit_payment
+    expect(page).to have_content("Payment Information")
     click_button("Save and Continue")
+    expect(page).to have_content("Put your terms and conditions here")
   end
 
   def check_terms_of_service

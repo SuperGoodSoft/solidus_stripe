@@ -86,6 +86,7 @@ module SolidusStripe::BackendTestHelper
 
   def visit_payments_page
     visit "/admin/orders/#{order.number}/payments"
+    expect(page).to have_current_path(%r{/admin/orders/R\d+/payments})
   end
 
   def visit_payment_page(payment)
@@ -139,7 +140,9 @@ module SolidusStripe::BackendTestHelper
     click_on "Continue"
     page.current_window.resize_to(1200, 800)
     click_on "Confirm"
+    expect(page).to have_content("Confirm Order")
     click_on "Complete Order"
+    expect(page).to have_content("Pending package from")
   end
 
   def refund_payment
