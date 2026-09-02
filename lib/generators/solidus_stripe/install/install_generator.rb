@@ -6,7 +6,7 @@ module SolidusStripe
       class_option :migrations, type: :boolean, default: true
       class_option :core, type: :boolean, default: true
       class_option :backend, type: :boolean, default: true
-      class_option :starter_frontend, type: :boolean, default: true
+      class_option :storefront, type: :boolean, default: true
 
       class_option :migrate, type: :boolean, default: true
       class_option :load_seeds, type: :boolean, default: true
@@ -51,11 +51,11 @@ module SolidusStripe
         end
       end
 
-      def install_solidus_starter_frontend_support
-        support_code_for(:starter_frontend) do
+      def install_solidus_storefront_support
+        support_code_for(:storefront) do
           directory 'app', 'app'
           inject_into_file(
-            'app/assets/stylesheets/solidus_starter_frontend.css',
+            'app/assets/stylesheets/solidus_storefront.css',
             " *= require spree/frontend/solidus_stripe\n",
             before: %r{\*/},
             verbose: true,
@@ -84,6 +84,12 @@ module SolidusStripe
         end
       end
 
+      def install_solidus_stripe_fixtures
+        if destination_root.include?('dummy-app')
+          directory 'fixtures', 'fixtures'
+        end
+      end
+
       def load_seeds
         if options[:migrate] && options[:load_seeds]
           say_status :load, "seed data", :blue
@@ -108,7 +114,7 @@ module SolidusStripe
           shell.indent do
             install_solidus_core_support
             install_solidus_backend_support
-            install_solidus_starter_frontend_support
+            install_solidus_storefront_support
           end
           say_status :watch, "update completed", :cyan
         end

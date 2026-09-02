@@ -2,7 +2,24 @@
 
 source 'https://rubygems.org'
 
-gemspec
+branch = ENV.fetch("SOLIDUS_BRANCH", "main")
+gem "solidus", github: "solidusio/solidus", branch: branch
+
+rails_version = ENV.fetch("RAILS_VERSION", "8.0")
+gem "rails", "~> #{rails_version}"
+
+case ENV.fetch("DB", nil)
+when "mysql"
+  gem "mysql2"
+when "postgresql"
+  gem "pg"
+else
+  gem "sqlite3", (rails_version < "7.2") ? "~> 1.4" : "~> 2.0"
+end
+
+if branch <= "v4.5"
+  gem "state_machines", "<= 0.6"
+end
 
 # Those are due to the "stdlib gemification" that's
 # happening between versions of ruby.
@@ -11,8 +28,6 @@ gem 'timeout'
 
 gem 'listen'
 
-gem 'activestorage'
-
 gem 'rspec_junit_formatter', require: false
-gem 'simplecov', '~> 0.22', require: false
-gem 'simplecov-cobertura', require: false
+
+gemspec

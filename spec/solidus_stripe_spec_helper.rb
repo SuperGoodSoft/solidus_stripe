@@ -1,10 +1,30 @@
 # frozen_string_literal: true
 
 require 'stripe'
-require 'solidus_starter_frontend_spec_helper'
+require 'solidus_storefront_spec_helper'
+require 'vcr'
 
 Dir["#{__dir__}/support/solidus_stripe/**/*.rb"].sort.each { |f| require f }
 
 RSpec.configure do |config|
   config.include SolidusStripe::Webhook::RequestHelper, type: :webhook_request
+end
+
+VCR.configure do |config|
+  config.cassette_library_dir = "fixtures/vcr_cassettes"
+  config.hook_into :webmock
+  config.ignore_localhost = true
+  config.configure_rspec_metadata!
+  config.filter_sensitive_data('<STRIPE_API_KEY>') { ENV['SOLIDUS_STRIPE_API_KEY'] }
+  config.filter_sensitive_data('<STRIPE_PUBLISHABLE_KEY>') { ENV['SOLIDUS_STRIPE_PUBLISHABLE_KEY'] }
+
+  config.register_request_matcher :stripe_uri do |request|
+    request.uri =~ %r{^https://api\.stripe\.com/v1/payment_methods/pm_.*} ||
+    request.uri =~ %r{^https://api\.stripe\.com/v1/payment_intents/pi_.*} ||
+    request.uri =~ %r{^https://api\.stripe\.com/v1/(customers|payment_intents|refunds)}
+  end
+
+  config.default_cassette_options = {
+    match_requests_on: [:method, :stripe_uri]
+  }
 end

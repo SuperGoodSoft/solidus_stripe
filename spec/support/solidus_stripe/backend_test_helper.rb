@@ -1,6 +1,15 @@
 # frozen_string_literal: true
 
 module SolidusStripe::BackendTestHelper
+  # Stripe rejects raw card numbers unless the account has the raw card data
+  # APIs enabled, so we map the test card numbers these specs use to Stripe's
+  # predefined test payment methods, which reproduce the same behaviour without
+  # that permission. See https://docs.stripe.com/testing#cards.
+  TEST_PAYMENT_METHODS = {
+    '4242424242424242' => 'pm_card_visa',
+    '4000000000003220' => 'pm_card_authenticationRequired',
+  }.freeze
+
   def create_payment_method(setup_future_usage: 'off_session', auto_capture: false)
     @payment_method = create(
       :solidus_stripe_payment_method,
@@ -25,16 +34,23 @@ module SolidusStripe::BackendTestHelper
   # Stripe-related helper methods for creating and fetching Stripe objects
 
   def create_stripe_payment_method(card_number)
+    # The predefined test payment methods are recognised by Stripe's API
+    # directly, so there's no raw card data to tokenize and no API call to make;
+    # we just need an object exposing the token as its id for downstream use.
+    Stripe::PaymentMethod.construct_from(id: TEST_PAYMENT_METHODS.fetch(card_number))
+  end
+
+  # Creates a Stripe payment method from raw test card data. Used by unit specs
+  # running against StripeMock, which — unlike the live API — accepts raw card
+  # data and can retrieve the resulting payment method by id. System specs run
+  # against the live API (via VCR) and must use #create_stripe_payment_method,
+  # which relies on Stripe's predefined test payment methods instead.
+  def create_stripe_mock_payment_method(card_number = '4242424242424242')
     payment_method.gateway.request do
-      Stripe::PaymentMethod.create({
+      Stripe::PaymentMethod.create(
         type: 'card',
-        card: {
-          number: card_number,
-          exp_month: 12,
-          exp_year: (Time.zone.now.year + 1),
-          cvc: '123',
-        },
-      })
+        card: { number: card_number, exp_month: 12, exp_year: Time.zone.now.year + 1, cvc: '123' }
+      )
     end
   end
 
@@ -45,7 +61,11 @@ module SolidusStripe::BackendTestHelper
         capture_method: 'manual',
         confirm: true,
         currency: 'usd',
-        payment_method: stripe_payment_method_id
+        payment_method: stripe_payment_method_id,
+        # These specs only deal with cards; restricting the payment method types
+        # keeps Stripe from pulling in redirect-based methods enabled on the
+        # account's dashboard, which would otherwise require a `return_url`.
+        payment_method_types: ['card']
       )
     end
   end
@@ -66,6 +86,7 @@ module SolidusStripe::BackendTestHelper
 
   def visit_payments_page
     visit "/admin/orders/#{order.number}/payments"
+    expect(page).to have_current_path(%r{/admin/orders/R\d+/payments})
   end
 
   def visit_payment_page(payment)
@@ -119,12 +140,14 @@ module SolidusStripe::BackendTestHelper
     click_on "Continue"
     page.current_window.resize_to(1200, 800)
     click_on "Confirm"
+    expect(page).to have_content("Confirm Order")
     click_on "Complete Order"
+    expect(page).to have_content("Pending package from")
   end
 
   def refund_payment
     refund_reason = create :refund_reason
-    click_icon(:"mail-reply") # Refund icon style reference in solidus_backend
+    click_icon(:reply) # Refund icon style reference in solidus_backend
     within '.new_refund' do
       select refund_reason.name, from: 'Reason'
       click_button 'Refund'
@@ -132,7 +155,7 @@ module SolidusStripe::BackendTestHelper
   end
 
   def partially_refund_payment(refund_reason, amount)
-    click_icon(:"mail-reply") # Refund icon style reference in solidus_backend
+    click_icon(:reply) # Refund icon style reference in solidus_backend
     within '.new_refund' do
       select refund_reason.name, from: 'Reason'
       fill_in 'Amount', with: amount

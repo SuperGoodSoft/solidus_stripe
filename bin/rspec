@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
-system(
-  "bin/rails dummy-app generate solidus_stripe:install --force --migrate --specs=all --sync --no-load-seeds",
-  out: "tmp/rspec-sync.log",
-  err: :out,
-) or abort(File.read("tmp/rspec-sync.log"))
+
+# Create the dummy app on first run, then sync the extension's sources into it
+# before running specs, mirroring solidus's storefront/bin/rspec.
+File.exist?("dummy-app/bin/rails") or system("bin/dummy-app") or abort("Could not create the dummy app")
+system("bin/sync") or abort("Could not sync the extension sources into the dummy app")
 
 system("bin/update-migrations", "dummy-app") unless ENV['CI']
 Dir.chdir "dummy-app/"

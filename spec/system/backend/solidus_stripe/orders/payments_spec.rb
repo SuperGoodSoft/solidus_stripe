@@ -2,7 +2,7 @@
 
 require 'solidus_stripe_spec_helper'
 
-RSpec.describe 'SolidusStripe Orders Payments', :js do
+RSpec.describe 'SolidusStripe Orders Payments', :js, :vcr do
   include SolidusStripe::BackendTestHelper
   include Devise::Test::IntegrationHelpers
   stub_authorization!

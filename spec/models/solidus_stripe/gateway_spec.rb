@@ -57,6 +57,7 @@ RSpec.describe SolidusStripe::Gateway do
       [:create, :retrieve].each do |method|
         allow(Stripe::PaymentIntent).to receive(method).and_return(stripe_payment_intent)
       end
+      allow(Stripe::Customer).to receive(:create).and_return(Stripe::Customer.construct_from(id: 'cus_123'))
       allow(payment.source).to receive(:stripe_payment_method).and_return(stripe_payment_method)
       allow(Stripe::PaymentIntent).to receive(:confirm).with(
         stripe_payment_intent.id
@@ -215,6 +216,7 @@ RSpec.describe SolidusStripe::Gateway do
       [:create, :retrieve].each do |method|
         allow(Stripe::PaymentIntent).to receive(method).and_return(stripe_payment_intent)
       end
+      allow(Stripe::Customer).to receive(:create).and_return(Stripe::Customer.construct_from(id: 'cus_123'))
       allow(payment.source).to receive(:stripe_payment_method).and_return(stripe_payment_method)
       allow(Stripe::PaymentIntent).to receive(:confirm).with(
         stripe_payment_intent.id

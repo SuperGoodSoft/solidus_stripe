@@ -42,7 +42,7 @@ RSpec.describe Spree::SolidusStripe::Api::IntentsController, type: :request do
   end
 
   describe '#create_payment_intent' do
-    let(:stripe_payment_method) { create_stripe_payment_method('4242424242424242') }
+    let(:stripe_payment_method) { create_stripe_mock_payment_method }
 
     context 'when the user is logged in' do
       let(:order) { create(:order, total: 500, user: current_api_user) }
