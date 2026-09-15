@@ -102,6 +102,11 @@ module SolidusStripe::CheckoutTestHelper
   end
 
   def fill_in_stripe_zip(zip)
+    within_frame(find_stripe_iframe) do
+      field = find(%{input[name="postalCode"]})
+      field.value.length.times { field.send_keys [:backspace] }
+    end
+
     fills_in_stripe_input 'postalCode', with: zip
   end
 
@@ -109,13 +114,7 @@ module SolidusStripe::CheckoutTestHelper
     using_wait_time(10) do
       within_frame(find_stripe_iframe) do
         with.to_s.chars.each { find(%{input[name="#{name}"]}).send_keys(_1) }
-        if name == 'expiry'
-          expect(page).to have_field(name, with: /#{with.to_s[0..1]}.*#{with.to_s[2..3]}/)
-        elsif name == 'number'
-          expect(page).to have_field(name, with: /#{with.to_s[0..3]}.*#{with.to_s[4..7]}.*#{with.to_s[8..11]}.*#{with.to_s[12..15]}/)
-        else
-          expect(page).to have_field(name, with: with.to_s)
-        end
+        expect(page).to have_field(name, with: Regexp.new(with.to_s.chars.join(".*")))
       end
     end
   end
