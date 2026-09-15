@@ -109,6 +109,11 @@ module SolidusStripe::CheckoutTestHelper
     using_wait_time(10) do
       within_frame(find_stripe_iframe) do
         with.to_s.chars.each { find(%{input[name="#{name}"]}).send_keys(_1) }
+        if name == 'expiry'
+          expect(page).to have_field(name, with: /#{with.to_s[0..1]}.*#{with.to_s[2..3]}/)
+        else
+          expect(page).to have_field(name, with: with.to_s)
+        end
       end
     end
   end
