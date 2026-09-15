@@ -215,6 +215,7 @@ module SolidusStripe::CheckoutTestHelper
     expect(page).to have_content("Payment Information")
     click_button("Save and Continue")
 
+    expect(page).to have_current_path('/checkout/confirm')
     expect(page).to have_content("Put your terms and conditions here"), -> {
       order = current_order.reload
 
